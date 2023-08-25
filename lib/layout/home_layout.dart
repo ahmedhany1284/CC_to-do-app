@@ -5,21 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:to_do_list/modules/new_tasks/new_tasks_screen.dart';
-import 'package:to_do_list/modules/done_tasks/done_tasks_screen.dart';
-import 'package:to_do_list/modules/archived_tasks/archived_tasks_screen.dart';
 import 'package:to_do_list/shared/components/components.dart';
-import 'package:to_do_list/shared/components/constants.dart';
 import 'package:to_do_list/shared/cubit/cubit.dart';
 import 'package:to_do_list/shared/cubit/states.dart';
-
-// 1- create database
-// 2-create table
-// 3- open database
-// 4- insert to data base
-// 5- get from database
-// 6- update from database
-// 7- delete from database
 
 class Homelayout extends StatelessWidget {
   late Database database;

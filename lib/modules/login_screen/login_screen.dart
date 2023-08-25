@@ -1,14 +1,44 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sqflite/utils/utils.dart';
 import 'package:to_do_list/layout/home_layout.dart';
 import 'package:to_do_list/shared/components/components.dart';
+
+
+
+class SquareTile extends StatelessWidget {
+  final String imagePath;
+  const SquareTile({
+    super.key,
+    required this.imagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white),
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.grey[200],
+      ),
+      child: Image.asset(
+        imagePath,
+        height: 40,
+      ),
+    );
+  }
+}
+
 
 class LoginScreen extends StatelessWidget {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,35 +124,22 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(
                   height: 10.0,
                 ),
-                Center(
-                  child: Container(
-                    width: 100.0,
-                    height: 50.0,
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(
-                              'assets/Google-Logo.wine.svg',
-                              width: 100.0,
-                              height: 50.0,
-                            ),
-                          ),
-                        ),
-                        MaterialButton(
-                          onPressed: () {
-                            print(emailController.text);
-                            print(passwordController.text);
-                            signInWithGoogle();
-                            navigateTo(context,Homelayout());
-                          },
-
-                        ),
-                      ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:  [
+                    MaterialButton(
+                      onPressed: () {
+                        print(emailController.text);
+                        print(passwordController.text);
+                        signInWithGoogle();
+                      },
+                      child: SquareTile(imagePath: 'assets/google.png'),
                     ),
-                  ),
+                  ],
                 ),
+
+
+                SizedBox(height: 20.0,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
