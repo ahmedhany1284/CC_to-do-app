@@ -1,13 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:to_do_list/layout/home_layout.dart';
 import 'package:to_do_list/shared/components/components.dart';
-
-
+import 'package:to_do_list/modules/login_screen/github_auth.dart';
+// import 'package:github/github.dart';
 
 class SquareTile extends StatelessWidget {
   final String imagePath;
+
   const SquareTile({
     super.key,
     required this.imagePath,
@@ -30,15 +32,9 @@ class SquareTile extends StatelessWidget {
   }
 }
 
-
 class LoginScreen extends StatelessWidget {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +122,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children:  [
+                  children: [
                     MaterialButton(
                       onPressed: () {
                         print(emailController.text);
@@ -135,11 +131,34 @@ class LoginScreen extends StatelessWidget {
                       },
                       child: SquareTile(imagePath: 'assets/google.png'),
                     ),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        print(emailController.text);
+                        print(passwordController.text);
+                        signInWithFacebook();
+                        print('entered the on pressed');
+                      },
+                      child: SquareTile(imagePath: 'assets/Facebook.png'),
+                    ),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        print(emailController.text);
+                        print(passwordController.text);
+                        // GithubAuthenticationButton();
+                      },
+                      child: SquareTile(imagePath: 'assets/github.png'),
+                    ),
                   ],
                 ),
-
-
-                SizedBox(height: 20.0,),
+                SizedBox(
+                  height: 20.0,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -163,20 +182,45 @@ class LoginScreen extends StatelessWidget {
   }
 
   signInWithGoogle() async {
+    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
+    GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
-    GoogleSignInAccount? googleUser =await GoogleSignIn().signIn();
-
-    GoogleSignInAuthentication? googleAuth =await googleUser?.authentication;
-
-    AuthCredential credential=GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken ,
+    AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
     );
-    UserCredential userCredential =await FirebaseAuth.instance.signInWithCredential(credential);
-    print (userCredential.user?.displayName);
-
-
-
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+    print(userCredential.user?.displayName);
   }
+
+  Future<UserCredential> signInWithFacebook() async {
+    final LoginResult loginResult = await FacebookAuth.instance.login(
+        permissions: ['email', 'public_profile', 'user_birthday']
+    );
+
+    final OAuthCredential facebookAuthCredential = FacebookAuthProvider.credential(loginResult.accessToken!.token);
+
+
+    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+  }
+
+
+// Future<UserCredential> signInWithGitHub() async {
+//   // Create a GitHubSignIn instance
+//   final GitHubSignIn gitHubSignIn = GitHubSignIn(
+//       clientId: clientId,
+//       clientSecret: clientSecret,
+//       redirectUrl: 'https://my-project.firebaseapp.com/__/auth/handler');
+//
+//   // Trigger the sign-in flow
+//   final result = await gitHubSignIn.signIn(context);
+//
+//   // Create a credential from the access token
+//   final githubAuthCredential = GithubAuthProvider.credential(result.token);
+//
+//   // Once signed in, return the UserCredential
+//   return await FirebaseAuth.instance.signInWithCredential(githubAuthCredential);
+// }
 }

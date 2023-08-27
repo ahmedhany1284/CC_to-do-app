@@ -47,6 +47,14 @@ dependencies:
   flutter_svg: ^0.22.0
   firebase_core: ^2.15.1
   fluttertoast: ^8.2.2
+  flutter_facebook_auth: ^6.0.1
+  google_fonts: ^5.1.0
+  sign_button: ^2.0.4
+  status_alert: ^1.0.1
+  local_auth: ^2.1.6
+  flutter_signin_button: ^2.0.0
+  oauth2: ^2.0.2
+  github: ^9.17.0
 
 
 dev_dependencies:

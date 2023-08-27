@@ -2,6 +2,7 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
@@ -55,11 +56,26 @@ class Homelayout extends StatelessWidget {
               centerTitle: true,
               actions: [
                 IconButton(
-                    onPressed: () async {
-                      await GoogleSignIn().signOut();
-                      FirebaseAuth.instance.signOut();
-                    },
-                    icon: Icon(Icons.power_settings_new),
+                  onPressed: () async {
+                    // Check the currently signed-in provider
+                    User? user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      if (user.providerData.any((userInfo) => userInfo.providerId == 'google.com')) {
+                        // Signed in with Google
+                        await GoogleSignIn().signOut();
+                      } else if (user.providerData.any((userInfo) => userInfo.providerId == 'facebook.com')) {
+                        // Signed in with Facebook
+                        await FacebookAuth.instance.logOut();
+                      } else if (user.providerData.any((userInfo) => userInfo.providerId == 'github.com')) {
+                        // Signed in with GitHub
+                        await GitHubSignIn().signOut();
+                      }
+
+                      // Sign out from Firebase Auth
+                      await FirebaseAuth.instance.signOut();
+                    }
+                  },
+                  icon: Icon(Icons.power_settings_new),
                 ),
               ],
             ),
