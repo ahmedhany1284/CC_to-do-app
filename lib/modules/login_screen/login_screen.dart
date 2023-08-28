@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -20,7 +21,7 @@ class SquareTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white),
         borderRadius: BorderRadius.circular(100),
@@ -61,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 2, 0, 83),
+        backgroundColor: const Color.fromARGB(255, 2, 0, 83),
         title: Text(
           'Sign In',
           style: TextStyle(
@@ -154,25 +155,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 20.0,
                     ),
-                    firebaseUIButton(context, "Sign In", () {
-                      FirebaseAuth.instance
-                          .signInWithEmailAndPassword(
-                              email: _emailTextController.text,
-                              password: _passwordTextController.text)
-                          .then((value) {
-                        navigateTo(context, Homelayout());
+                    firebaseUIButton(context, "Sign In", () async {
+                      try {
+                        UserCredential userCredential =
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: _emailTextController.text,
+                          password: _passwordTextController.text,
+                        );
+
+                        // Update Firestore user information
+                        updateFirestoreUserInfo(userCredential.user);
+
+                        navigateToAndFinish(context, Homelayout());
                         showCustomToast('Logged in successfully');
-                      }).onError((error, stackTrace) {
+                      } catch (error) {
                         String e = error.toString();
-
-                        showCustomToast(
-                            e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
-
-                        print("Error ${error.toString()}");
-                      });
+                        showCustomToast(e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
+                        print("Error $e");
+                      }
                     }),
+
                     forgetPassword(context),
-                    SizedBox(
+                    const SizedBox(
                       height: 10.0,
                     ),
                     Row(
@@ -180,76 +184,69 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         MaterialButton(
                           onPressed: () {
-                            print(_emailTextController.text);
-                            print(_passwordTextController.text);
                             signInWithGoogle().then((value) {
-                              navigateTo(context, Homelayout());
+                              navigateToAndFinish(context, Homelayout());
                               showCustomToast('Logged in successfully');
                             }).onError((error, stackTrace) {
                               String e = error.toString();
-
                               showCustomToast(
                                   e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
 
                               print("Error ${error.toString()}");
                             });
                           },
-                          child: SquareTile(imagePath: 'assets/google.png'),
+                          child: const SquareTile(
+                              imagePath: 'assets/google.png'),
                         ),
                         MaterialButton(
                           onPressed: () {
                             print(_emailTextController.text);
                             print(_passwordTextController.text);
                             signInWithFacebook().then((value) {
-                              navigateTo(context, Homelayout());
+                              navigateToAndFinish(context, Homelayout());
                               showCustomToast('Logged in successfully');
                             }).onError((error, stackTrace) {
                               String e = error.toString();
 
                               showCustomToast(
                                   e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
-
-                              print("Error ${error.toString()}");
                             });
-                            print('entered the on pressed');
                           },
-                          child: SquareTile(imagePath: 'assets/Facebook.png'),
+                          child: const SquareTile(
+                              imagePath: 'assets/Facebook.png'),
                         ),
                         MaterialButton(
                           onPressed: () {
-                            print(_emailTextController.text);
-                            print(_passwordTextController.text);
                             signInWithGitHub(context).then((value) {
-                              navigateTo(context, Homelayout());
+                              navigateToAndFinish(context, Homelayout());
                               showCustomToast('Logged in successfully');
                             }).onError((error, stackTrace) {
                               String e = error.toString();
 
                               showCustomToast(
                                   e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
-
-                              print("Error ${error.toString()}");
                             });
                           },
-                          child: SquareTile(imagePath: 'assets/github.png'),
+                          child: const SquareTile(
+                              imagePath: 'assets/github.png'),
                         ),
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20.0,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           'Don\'t have an account?',
                           style: TextStyle(color: Colors.white70),
                         ),
                         TextButton(
                           onPressed: () {
-                            navigateTo(context, SignUpScreen());
+                            navigateToAndFinish(context, const SignUpScreen());
                           },
-                          child: Text(
+                          child: const Text(
                             'Register Now',
                             style: TextStyle(
                                 color: Colors.white,
@@ -266,17 +263,23 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-          Color.fromARGB(255, 2, 0, 83),
-          hexStringToColor("aB2B93"),
-          hexStringToColor("7546C4"),
-          hexStringToColor("5E61F6"),
-          Color.fromARGB(255, 2, 0, 83),
-        ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+              const Color.fromARGB(255, 2, 0, 83),
+              hexStringToColor("aB2B93"),
+              hexStringToColor("7546C4"),
+              hexStringToColor("5E61F6"),
+              const Color.fromARGB(255, 2, 0, 83),
+            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
       ),
     );
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+
+  final userFR = FirebaseFirestore.instance.collection('user');
+
+  final quizepaperFR = FirebaseFirestore.instance.collection('quizpapers');
+  final leaderBoard = FirebaseFirestore.instance.collection('leaderboard');
+
+  Future<UserCredential> signInWithGoogle() async {
     GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
@@ -285,9 +288,11 @@ class _LoginScreenState extends State<LoginScreen> {
       accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
     );
-    UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
-    print(userCredential.user?.displayName);
+    UserCredential userCredential = await FirebaseAuth.instance
+        .signInWithCredential(credential);
+    updateFirestoreUserInfo(googleUser);
+
+    return userCredential;
   }
 
   Future<UserCredential> signInWithFacebook() async {
@@ -295,10 +300,26 @@ class _LoginScreenState extends State<LoginScreen> {
         .login(permissions: ['email', 'public_profile', 'user_birthday']);
 
     final OAuthCredential facebookAuthCredential =
-        FacebookAuthProvider.credential(loginResult.accessToken!.token);
+    FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
-    return FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+    UserCredential userCredential =
+    await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+
+    if (userCredential.user != null) {
+      // Use the user's UID as the document ID in Firestore
+      String uid = userCredential.user!.uid;
+
+      // Store user information in Firestore under 'users' collection
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        "email": userCredential.user!.email,
+        "name": userCredential.user!.displayName,
+        "profilepic": userCredential.user!.photoURL,
+      });
+    }
+
+    return userCredential;
   }
+
 
   Future<UserCredential> signInWithGitHub(BuildContext context) async {
     final GitHubSignIn gitHubSignIn = GitHubSignIn(
@@ -311,15 +332,16 @@ class _LoginScreenState extends State<LoginScreen> {
     final result = await gitHubSignIn.signIn(context);
 
     final githubAuthCredentials = GithubAuthProvider.credential(result.token!);
-
-    print('got to github func');
-    return await FirebaseAuth.instance
+      return await FirebaseAuth.instance
         .signInWithCredential(githubAuthCredentials);
   }
 
   Widget forgetPassword(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery
+          .of(context)
+          .size
+          .width,
       height: 35,
       alignment: Alignment.bottomRight,
       child: TextButton(
@@ -328,9 +350,27 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(color: Colors.white70),
           textAlign: TextAlign.left,
         ),
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ResetPassword())),
+        onPressed: () =>
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ResetPassword())),
       ),
     );
+  }
+}
+
+
+Future<void> updateFirestoreUserInfo( user) async {
+  if (user != null) {
+    String uid = user.uid;
+
+    // Store user information in Firestore under 'users' collection
+    await FirebaseFirestore.instance.collection('users').add({
+      "email": user.email,
+      "name": user.displayName,
+      "profilepic": user.photoURL,
+    }).whenComplete(() =>print('success')).catchError((error){
+      print('did not save');
+    });
   }
 }

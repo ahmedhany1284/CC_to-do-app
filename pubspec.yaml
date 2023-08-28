@@ -53,9 +53,9 @@ dependencies:
   local_auth: ^2.1.6
   flutter_signin_button: ^2.0.0
   oauth2: ^2.0.2
-  github: ^9.17.0
   http: ^0.13.3
   github_sign_in_plus: ^0.0.2
+  cloud_firestore: ^4.9.0
 
 
 
