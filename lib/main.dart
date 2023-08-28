@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
           }
           if (snapshot.connectionState==ConnectionState.active){
             if(snapshot.data==null){
+              print('snap shot : $snapshot.data');
               return LoginScreen();
             }
             else{

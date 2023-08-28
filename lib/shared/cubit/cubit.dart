@@ -140,6 +140,23 @@ class AppCubit extends Cubit<AppStates>
     isBottomsheeetShown=isShow;
     fabicon=icon;
 
+
     emit(AppChangeBottomSheetStates());
+  }
+
+  void signOut() {
+    // Perform sign-out operations here
+    // For example: clear tokens, reset user data, etc.
+
+    // Emit AuthSignedOut state
+    emit(AuthSignedOut());
+  }
+
+
+  void signedIn(String email, String password) async {
+    // Perform sign-in operations
+
+    // Emit AuthSignedIn state to navigate to home layout
+    emit(AuthSignedIn());
   }
 }

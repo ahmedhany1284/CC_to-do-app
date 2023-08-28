@@ -16,4 +16,10 @@ class AppDeleteDataBaseState extends AppStates{}
 class AppChangeBottomSheetStates extends AppStates{}
 
 
+class AuthInitialState extends AppStates{}
+
+class AuthSignedOut extends AppStates{}
+class AuthSignedIn extends AppStates{}
+
+
 

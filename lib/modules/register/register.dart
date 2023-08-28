@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_list/layout/home_layout.dart';
+import 'package:to_do_list/modules/login_screen/login_screen.dart';
 import 'package:to_do_list/shared/components/components.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -74,7 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     print("Created New Account");
                     showCustomToast("Created New Account");
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Homelayout()));
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
                   }).onError((error, stackTrace) {
                     String e = error.toString();
 

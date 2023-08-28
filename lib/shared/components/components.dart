@@ -35,7 +35,7 @@ bool ok=false;
 
 
 Widget buildTaskItem(Map model, context) => Dismissible(
-  crossAxisEndOffset: 10,
+  crossAxisEndOffset: 0,
   key: Key(model['id'].toString()),
   child: Padding(
     padding: const EdgeInsets.all(8.0),
@@ -175,6 +175,14 @@ void navigateTo(context, widget) => Navigator.push(
   MaterialPageRoute(
     builder: (context) => widget,
   ),
+);
+
+void navigateToAndFinish(context, widget) => Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (context) => widget,
+    ),
+        (Route<dynamic>route)=>false
 );
 
 

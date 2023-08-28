@@ -3,11 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:github_sign_in/github_sign_in.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:to_do_list/modules/login_screen/login_screen.dart';
 import 'package:to_do_list/shared/components/components.dart';
 import 'package:to_do_list/shared/cubit/cubit.dart';
 import 'package:to_do_list/shared/cubit/states.dart';
@@ -18,25 +18,33 @@ import 'dart:convert';
 
 class Homelayout extends StatelessWidget {
   late Database database;
-  var scaffoldkey = GlobalKey<ScaffoldState>();
-  var formKey = GlobalKey<FormState>();
-  var titlecontroller = TextEditingController();
-  var timecontroller = TextEditingController();
-  var datecontroller = TextEditingController();
 
+  var scaffoldkey = GlobalKey<ScaffoldState>();
+
+  var formKey = GlobalKey<FormState>();
+
+  var titlecontroller = TextEditingController();
+
+  var timecontroller = TextEditingController();
+
+  var datecontroller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    return BlocProvider (
       create: (BuildContext context) => AppCubit()..createDatabase(),
       child: BlocConsumer<AppCubit, AppStates>(
         listener: (BuildContext context, AppStates state) {
           if (state is AppInsertDataBaseState) {
             Navigator.pop(context);
           }
+          if (state is AuthSignedOut) {
+            navigateToAndFinish(context, LoginScreen());
+          }
         },
         builder: (BuildContext context, AppStates state) {
           AppCubit cubit = AppCubit.get(context);
+
 
           return Scaffold(
             key: scaffoldkey,
@@ -66,10 +74,15 @@ class Homelayout extends StatelessWidget {
                 IconButton(
                   onPressed: () async {
                     await GoogleSignIn().signOut();
-                    FirebaseAuth.instance.signOut();
+                    await FacebookAuth.instance.logOut();
+                    await FirebaseAuth.instance.signOut();
+
+                    cubit.signOut();
+                    showCustomToast("Signed Out Successfully");
                   },
                   icon: Icon(Icons.power_settings_new),
                 ),
+
               ],
             ),
             body: Container(
@@ -99,8 +112,13 @@ class Homelayout extends StatelessWidget {
                       time: timecontroller.text,
                       date: datecontroller.text,
                     );
+                    titlecontroller.text = '';
+                    timecontroller.text = '';
+                    datecontroller.text = '';
                   }
-                } else {
+
+                }
+                else {
                   scaffoldkey.currentState
                       ?.showBottomSheet(
                         (context) => Container(

@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:github_sign_in/github_sign_in.dart';
+import 'package:github_sign_in_plus/github_sign_in_plus.dart';
+
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:to_do_list/layout/home_layout.dart';
 import 'package:to_do_list/modules/register/register.dart';
@@ -181,7 +182,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             print(_emailTextController.text);
                             print(_passwordTextController.text);
-                            signInWithGoogle();
+                            signInWithGoogle().then((value) {
+                              navigateTo(context, Homelayout());
+                              showCustomToast('Logged in successfully');
+                            }).onError((error, stackTrace) {
+                              String e = error.toString();
+
+                              showCustomToast(
+                                  e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
+
+                              print("Error ${error.toString()}");
+                            });
                           },
                           child: SquareTile(imagePath: 'assets/google.png'),
                         ),
@@ -189,7 +200,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             print(_emailTextController.text);
                             print(_passwordTextController.text);
-                            signInWithFacebook();
+                            signInWithFacebook().then((value) {
+                              navigateTo(context, Homelayout());
+                              showCustomToast('Logged in successfully');
+                            }).onError((error, stackTrace) {
+                              String e = error.toString();
+
+                              showCustomToast(
+                                  e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
+
+                              print("Error ${error.toString()}");
+                            });
                             print('entered the on pressed');
                           },
                           child: SquareTile(imagePath: 'assets/Facebook.png'),
@@ -198,7 +219,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             print(_emailTextController.text);
                             print(_passwordTextController.text);
-                            signInWithGitHub(context);
+                            signInWithGitHub(context).then((value) {
+                              navigateTo(context, Homelayout());
+                              showCustomToast('Logged in successfully');
+                            }).onError((error, stackTrace) {
+                              String e = error.toString();
+
+                              showCustomToast(
+                                  e.replaceAll(RegExp(r'\[.*?\]'), '').trim());
+
+                              print("Error ${error.toString()}");
+                            });
                           },
                           child: SquareTile(imagePath: 'assets/github.png'),
                         ),
@@ -221,7 +252,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             'Register Now',
                             style: TextStyle(
-                                color: Colors.white, fontWeight: FontWeight.bold),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -244,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
     GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
@@ -280,6 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final githubAuthCredentials = GithubAuthProvider.credential(result.token!);
 
+    print('got to github func');
     return await FirebaseAuth.instance
         .signInWithCredential(githubAuthCredentials);
   }
