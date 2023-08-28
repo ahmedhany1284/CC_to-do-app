@@ -3,12 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:github_sign_in/github_sign_in.dart';
+
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:to_do_list/shared/components/components.dart';
 import 'package:to_do_list/shared/cubit/cubit.dart';
 import 'package:to_do_list/shared/cubit/states.dart';
+
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class Homelayout extends StatelessWidget {
   late Database database;
@@ -17,6 +23,7 @@ class Homelayout extends StatelessWidget {
   var titlecontroller = TextEditingController();
   var timecontroller = TextEditingController();
   var datecontroller = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +42,7 @@ class Homelayout extends StatelessWidget {
             key: scaffoldkey,
             appBar: AppBar(
               backgroundColor: Color.fromARGB(255, 2, 0, 83),
-              elevation: 1,
+              elevation: 5,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -55,38 +62,32 @@ class Homelayout extends StatelessWidget {
               ),
               centerTitle: true,
               actions: [
+
                 IconButton(
                   onPressed: () async {
-                    // Check the currently signed-in provider
-                    User? user = FirebaseAuth.instance.currentUser;
-                    if (user != null) {
-                      if (user.providerData.any((userInfo) => userInfo.providerId == 'google.com')) {
-                        // Signed in with Google
-                        await GoogleSignIn().signOut();
-                      } else if (user.providerData.any((userInfo) => userInfo.providerId == 'facebook.com')) {
-                        // Signed in with Facebook
-                        await FacebookAuth.instance.logOut();
-                      } else if (user.providerData.any((userInfo) => userInfo.providerId == 'github.com')) {
-                        // Signed in with GitHub
-                        await GitHubSignIn().signOut();
-                      }
-
-                      // Sign out from Firebase Auth
-                      await FirebaseAuth.instance.signOut();
-                    }
+                    await GoogleSignIn().signOut();
+                    FirebaseAuth.instance.signOut();
                   },
                   icon: Icon(Icons.power_settings_new),
                 ),
               ],
             ),
             body: Container(
-              color: Color.fromARGB(255, 2, 0, 83),
+
               child: ConditionalBuilder(
                 condition: state is! AppGetDataBaseLoadingState,
                 builder: (context) => cubit.screen[cubit.cur_var],
                 fallback: (context) =>
                     Center(child: CircularProgressIndicator()),
               ),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                    Color.fromARGB(255, 2, 0, 83),
+                    hexStringToColor("aB2B93"),
+                    hexStringToColor("7546C4"),
+                    hexStringToColor("5E61F6"),
+                    Color.fromARGB(255, 2, 0, 83),
+                  ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
             ),
             floatingActionButton: FloatingActionButton(
               backgroundColor: Color.fromARGB(255, 254, 151, 91),

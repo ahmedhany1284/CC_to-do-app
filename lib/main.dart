@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'To Do App',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
           if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
+            return Text('snap shot error:  ${snapshot.error.toString()}');
           }
           if (snapshot.connectionState==ConnectionState.active){
             if(snapshot.data==null){
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
               return Homelayout();
             }
           }
-          return Text('');
+          return CircularProgressIndicator();
         },
       ),
 
