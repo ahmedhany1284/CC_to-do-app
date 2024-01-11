@@ -4,7 +4,6 @@
 clean and organized code structure.
 - Utilized the shared_preferences package in Flutter to store and retrieve user
 preferences and persist todo data.
-2023 – 2023
 - Integrated the Bloc library to handle state changes, ensuring efficient
 management of the app's UI and data flow.
 - Implemented a user-friendly interface with smooth transitions and animations,
